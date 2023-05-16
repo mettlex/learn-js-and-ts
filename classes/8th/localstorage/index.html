@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Storage</title>
+  </head>
+  <body>
+    <p id="paragraph"></p>
+
+    <form onsubmit="saveInStorage(event)">
+      <input
+        name="info"
+        type="text"
+        placeholder="type something here"
+        autocomplete="off"
+        required
+      />
+      <button id="btn" type="submit">Save</button>
+    </form>
+
+    <script>
+      paragraph.textContent = localStorage.getItem("key") || "Submit the form";
+
+      function saveInStorage(event) {
+        event.preventDefault();
+
+        const data = event.target.info.value;
+
+        paragraph.textContent = data;
+
+        localStorage.setItem("key", data);
+
+        event.target.info.value = "";
+      }
+    </script>
+  </body>
+</html>
