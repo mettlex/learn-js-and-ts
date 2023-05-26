@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Todo OOP</title>
+  </head>
+  <body>
+    <div class="container">
+      <form onsubmit="handleSave(event)">
+        <input
+          type="text"
+          id="todo-text"
+          placeholder="type something here"
+          autocomplete="off"
+          required
+        />
+        <button id="btn" type="submit">Save</button>
+      </form>
+
+      <ul id="list"></ul>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>
