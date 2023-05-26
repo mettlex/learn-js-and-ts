@@ -48,3 +48,14 @@
 ### Step 6. Learn Expo + React Native for native mobile apps
 
 `[todo]`
+
+### Step 7. Learn Algorithms & Better Programming
+
+(a) [The Last Algorithms Course You'll Need](https://frontendmasters.com/courses/algorithms/) by [ThePrimeagen](https://github.com/ThePrimeagen)
+
+### Step 8. Learn Other Programming Languages
+
+- Don't limit yourself to one or two programming languages.
+- Learn C & Rust. Target Web Assembly.
+- Learn Python for AI & Machine Learning.
+- Learn the best stack in the technology you want to work on.
