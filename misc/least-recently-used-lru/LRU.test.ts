@@ -8,10 +8,6 @@ type User = {
 
 const lru = createLRU<User>({
   capacity: 4,
-  findIndex: (user: User, sequence: User[]) => {
-    return sequence.findIndex((x) => x.username === user.username && x.password === user.password)
-  },
-  filter: (user: User, sequence: User[]) => sequence.filter(x => x.username !== user.username)
 })
 
 lru.set("Monir", { username: "Monir", password: "password1" })
@@ -32,5 +28,5 @@ Deno.test("Removes the least recently used", () => {
 Deno.test("Moves the most recently used", () => {
   lru.get("Azmain")
 
-  assertEquals(lru.sequence[lru.sequence.length - 1], { username: "Azmain", password: "password3" })
+  assertEquals(lru.sequence.get(lru.sequence.length() - 1), { username: "Azmain", password: "password3" })
 })
