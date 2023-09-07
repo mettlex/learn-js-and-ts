@@ -26,18 +26,18 @@ export class RecipeList {
 
     const index = this.#recipes.findIndex((r) => r.name === recipeName);
 
-    if (recipeToUpdate) {
-      const updatedRecipe = {
-        ...recipeToUpdate,
-        ...updatedProps,
-      };
-
-      this.#recipes[index] = updatedRecipe;
-
-      return updatedRecipe;
+    if (!recipeToUpdate) {
+      return undefined;
     }
 
-    return undefined;
+    const updatedRecipe = {
+      ...recipeToUpdate,
+      ...updatedProps,
+    };
+
+    this.#recipes[index] = updatedRecipe;
+
+    return updatedRecipe;
   }
 
   // DELETE
@@ -46,12 +46,13 @@ export class RecipeList {
       (recipe) => recipe.name === recipeName,
     );
 
-    if (recipeIndex !== -1) {
-      this.#recipes.splice(recipeIndex, 1);
-      return true;
+    if (recipeIndex === -1) {
+      return false;
     }
 
-    return false;
+    this.#recipes.splice(recipeIndex, 1);
+
+    return true;
   }
 
   // LIST
