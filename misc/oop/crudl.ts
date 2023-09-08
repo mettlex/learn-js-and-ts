@@ -1,30 +1,37 @@
 import { Recipe, RecipeInterface } from "./recipe";
 
-export class RecipeList {
-  #recipes: Recipe[] = [];
+export interface RecipeWithId extends RecipeInterface {
+  id: number;
+}
+
+export class RecipeCollection {
+  #recipes: RecipeWithId[] = [];
 
   // CREATE
   addRecipe(props: RecipeInterface): Recipe {
     const newRecipe = new Recipe(props);
 
-    this.#recipes.push(newRecipe);
+    this.#recipes.push({
+      ...newRecipe,
+      id: this.getNextId(),
+    });
 
     return newRecipe;
   }
 
   // READ
-  readRecipe(recipeName: string): Recipe | undefined {
-    return this.#recipes.find((recipe) => recipe.name === recipeName);
+  readRecipe(recipeId: number) {
+    return this.#recipes.find((recipe) => recipe.id === recipeId);
   }
 
   // UPDATE
   updateRecipe(
-    recipeName: string,
+    recipeId: number,
     updatedProps: Partial<RecipeInterface>,
   ): Recipe | undefined {
-    const recipeToUpdate = this.readRecipe(recipeName);
+    const recipeToUpdate = this.readRecipe(recipeId);
 
-    const index = this.#recipes.findIndex((r) => r.name === recipeName);
+    const index = this.#recipes.findIndex((r) => r.id === recipeId);
 
     if (!recipeToUpdate) {
       return undefined;
@@ -41,9 +48,9 @@ export class RecipeList {
   }
 
   // DELETE
-  deleteRecipe(recipeName: string): boolean {
+  deleteRecipe(recipeId: number): boolean {
     const recipeIndex = this.#recipes.findIndex(
-      (recipe) => recipe.name === recipeName,
+      (recipe) => recipe.id === recipeId,
     );
 
     if (recipeIndex === -1) {
@@ -56,7 +63,19 @@ export class RecipeList {
   }
 
   // LIST
-  listRecipes(): Recipe[] {
+  getAll(): RecipeWithId[] {
     return this.#recipes;
+  }
+
+  getNextId(): number {
+    const lastRecipe = this.#recipes[this.#recipes.length - 1];
+
+    let id = 0;
+
+    if (lastRecipe) {
+      id = lastRecipe.id + 1;
+    }
+
+    return id;
   }
 }
