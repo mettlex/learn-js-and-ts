@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Todo App</title>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        display: flex;
+      }
+
+      div#fp-app {
+        width: 100%;
+        text-align: center;
+      }
+
+      div,
+      button {
+        margin: 5px;
+      }
+
+      input {
+        width: 150px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="fp-app">
+      <h3>Todo FP</h3>
+      <form id="form-fp">
+        <input type="text" id="text-input-fp" required />
+        <button id="add-btn-fp">Add</button>
+      </form>
+      <div id="todos-container-fp"></div>
+    </div>
+
+    <script type="module" src="todo.module.ts"></script>
+  </body>
+</html>
