@@ -1,3 +1,4 @@
+import { createElement } from "../lib/tsx";
 import { iifeForEvent, useId } from "../lib/utils";
 
 // Model
@@ -15,6 +16,10 @@ const containerId = useId("count");
 type CounterProps = {
   count?: number;
 };
+
+// We should do something better than this! See: Todo.tsx
+window.counterState = counterState;
+window.updateCountElement = updateCountElement;
 
 // View
 export function Counter({ count = 0 }: CounterProps) {
@@ -46,10 +51,10 @@ function IncrementButton() {
     <button
       onclick={iifeForEvent(() => {
         // Update State
-        counterState.count += 1;
+        window.counterState.count += 1;
 
         // Update View
-        updateCountElement();
+        window.updateCountElement();
       })}
       style={{ margin: "5px" }}
     >
@@ -63,10 +68,10 @@ function DecrementButton() {
     <button
       onclick={iifeForEvent(() => {
         // Update State
-        counterState.count -= 1;
+        window.counterState.count -= 1;
 
         // Update View
-        updateCountElement();
+        window.updateCountElement();
       })}
       style={{ margin: "5px" }}
     >
@@ -95,7 +100,3 @@ declare global {
     updateCountElement: typeof updateCountElement;
   }
 }
-
-// We should do something better than this! See: Todo.tsx
-window.counterState = counterState;
-window.updateCountElement = updateCountElement;

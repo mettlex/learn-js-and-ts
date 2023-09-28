@@ -1,5 +1,5 @@
-import escapeHTML from "escape-html";
-
+// @ts-ignore
+import { createElement } from "../lib/tsx";
 import { iifeForEvent, useId } from "../lib/utils";
 import { sendUpdateEvent } from "../lib/event";
 
@@ -28,6 +28,8 @@ type TodoProps = {
   todos: Todo[];
 };
 
+window.sendUpdateEvent = sendUpdateEvent;
+
 // View
 export function Todo({ todos: safeTodos }: TodoProps) {
   todoState.todos = safeTodos;
@@ -42,7 +44,7 @@ export function Todo({ todos: safeTodos }: TodoProps) {
         }}
         onsubmit={iifeForEvent(function (this: HTMLFormElement, event) {
           event.preventDefault();
-          sendUpdateEvent({
+          window.sendUpdateEvent({
             type: "ADD_TODO",
             element: this,
           });
@@ -77,7 +79,7 @@ function TodoItem({ todo }: { todo: Todo }) {
       <button
         onclick={iifeForEvent(function (this: HTMLButtonElement) {
           // Recommended: Send Update Event
-          sendUpdateEvent({
+          window.sendUpdateEvent({
             type: "DELETE_TODO",
             element: this.closest("li") as HTMLLIElement,
           });
@@ -94,13 +96,14 @@ function TodoItem({ todo }: { todo: Todo }) {
           userSelect: "none",
         }}
         onclick={iifeForEvent(function (this: HTMLSpanElement) {
-          sendUpdateEvent({
+          window.sendUpdateEvent({
             type: "TOGGLE_TODO",
             element: this.closest("li") as HTMLLIElement,
           });
         })}
+        safe
       >
-        {escapeHTML(todo.content)}
+        {todo.content}
       </span>
     </li>
   );
@@ -117,7 +120,7 @@ export function addTodoElement(todo: Todo) {
 
   const li = document.createElement("li");
 
-  li.innerHTML = <TodoItem todo={todo} />;
+  li.innerHTML = (<TodoItem todo={todo} />) as string;
 
   container.appendChild(li.firstChild!);
 }

@@ -1,4 +1,4 @@
-import "@kitajs/html/register";
+import { createElement } from "./lib/tsx";
 
 import { iifeForEvent } from "./lib/utils";
 import { Counter } from "./components/Counter";

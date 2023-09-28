@@ -18,6 +18,10 @@ class UpdateEvent extends Event {
   }
 }
 
+export function sendUpdateEvent(data: EventData) {
+  window.dispatchEvent(new UpdateEvent(data));
+}
+
 window.addEventListener("update", (event: UpdateEvent) => {
   const { data } = event;
 
@@ -73,10 +77,4 @@ declare global {
   interface Window {
     sendUpdateEvent: typeof sendUpdateEvent;
   }
-}
-
-window.sendUpdateEvent = sendUpdateEvent;
-
-export function sendUpdateEvent(data: EventData) {
-  window.dispatchEvent(new UpdateEvent(data));
 }
