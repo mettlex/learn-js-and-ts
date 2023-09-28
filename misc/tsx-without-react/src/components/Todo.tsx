@@ -1,4 +1,3 @@
-// @ts-ignore
 import { createElement } from "../lib/tsx";
 import { iifeForEvent, useId } from "../lib/utils";
 import { sendUpdateEvent } from "../lib/event";
