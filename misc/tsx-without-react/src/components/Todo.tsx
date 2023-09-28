@@ -11,7 +11,7 @@ type Todo = {
 
 type TodoState = {
   inputText: string;
-  todos: Todo[];
+  todos: (Todo | null)[];
   nextId: number;
 };
 
@@ -120,13 +120,13 @@ export function addTodoElement(todo: Todo) {
 
   const li = document.createElement("li");
 
-  li.innerHTML = (<TodoItem todo={todo} />) as string;
+  li.innerHTML = <TodoItem todo={todo} />;
 
   container.appendChild(li.firstChild!);
 }
 
 export function deleteTodo(index: number) {
-  todoState.todos.splice(index, 1);
+  todoState.todos[index] = null;
 }
 
 export function deleteTodoElement(todoId: string) {
