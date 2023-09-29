@@ -1,5 +1,5 @@
 import { createElement } from "../lib/tsx";
-import { iifeForEvent, useId } from "../lib/utils";
+import { useId } from "../lib/utils";
 import { sendUpdateEvent } from "../lib/event";
 
 // Model
@@ -27,7 +27,7 @@ type TodoProps = {
   todos: Todo[];
 };
 
-window.sendUpdateEvent = sendUpdateEvent;
+export const todoFormId = useId("todo-form");
 
 // View
 export function Todo({ todos: safeTodos }: TodoProps) {
@@ -38,16 +38,10 @@ export function Todo({ todos: safeTodos }: TodoProps) {
       <h3>Todos</h3>
 
       <form
+        id={todoFormId}
         style={{
           margin: "10px",
         }}
-        onsubmit={iifeForEvent(function (this: HTMLFormElement, event) {
-          event.preventDefault();
-          window.sendUpdateEvent({
-            type: "ADD_TODO",
-            element: this,
-          });
-        })}
       >
         <button type="submit">➕</button>
 
@@ -70,36 +64,32 @@ export function Todo({ todos: safeTodos }: TodoProps) {
   );
 }
 
+export const todoDeleteButtonIds: string[] = [];
+export const todoToggleContainerIds: string[] = [];
+
 function TodoItem({ todo }: { todo: Todo }) {
   const id = useNextTodoId();
 
+  const todoDeleteButtonId = `delete-btn-${id}`;
+
+  todoDeleteButtonIds.push(todoDeleteButtonId);
+
+  const todoToggleContainerId = `toggle-${id}`;
+
+  todoToggleContainerIds.push(todoToggleContainerId);
+
   return (
     <li id={id} style={{ margin: "10px" }}>
-      <button
-        onclick={iifeForEvent(function (this: HTMLButtonElement) {
-          // Recommended: Send Update Event
-          window.sendUpdateEvent({
-            type: "DELETE_TODO",
-            element: this.closest("li") as HTMLLIElement,
-          });
-        })}
-      >
-        🗑️
-      </button>
+      <button id={todoDeleteButtonId}>🗑️</button>
 
       <span
+        id={todoToggleContainerId}
         style={{
           margin: "10px",
           textDecoration: todo.complete && "line-through",
           cursor: "pointer",
           userSelect: "none",
         }}
-        onclick={iifeForEvent(function (this: HTMLSpanElement) {
-          window.sendUpdateEvent({
-            type: "TOGGLE_TODO",
-            element: this.closest("li") as HTMLLIElement,
-          });
-        })}
         safe
       >
         {todo.content}
@@ -117,11 +107,29 @@ export function addTodoElement(todo: Todo) {
     listContainerId,
   ) as HTMLOListElement;
 
-  const li = document.createElement("li");
+  const element = document.createElement("li");
 
-  li.innerHTML = <TodoItem todo={todo} />;
+  element.innerHTML = <TodoItem todo={todo} />;
 
-  container.appendChild(li.firstChild!);
+  const li = element.firstChild as HTMLLIElement;
+
+  if (li) {
+    container.appendChild(li);
+
+    const todoDeleteButtonId =
+      todoDeleteButtonIds[todoDeleteButtonIds.length - 1];
+
+    const todoToggleContainerId =
+      todoToggleContainerIds[todoToggleContainerIds.length - 1];
+
+    document
+      .getElementById(todoToggleContainerId as string)
+      ?.addEventListener("click", handleTodoToggleClick);
+
+    document
+      .getElementById(todoDeleteButtonId as string)
+      ?.addEventListener("click", handleTodoDeleteButtonClick);
+  }
 }
 
 export function deleteTodo(index: number) {
@@ -159,4 +167,26 @@ export function toggleTodoElement(index: number, todoElement: HTMLElement) {
 
 function useNextTodoId() {
   return "todo-" + (++todoState.nextId).toString();
+}
+
+export function handleTodoFormSubmit(this: HTMLElement, event: SubmitEvent) {
+  event.preventDefault();
+  sendUpdateEvent({
+    type: "ADD_TODO",
+    element: this,
+  });
+}
+
+export function handleTodoDeleteButtonClick(this: HTMLButtonElement) {
+  sendUpdateEvent({
+    type: "DELETE_TODO",
+    element: this.closest("li") as HTMLLIElement,
+  });
+}
+
+export function handleTodoToggleClick(this: HTMLSpanElement) {
+  sendUpdateEvent({
+    type: "TOGGLE_TODO",
+    element: this.closest("li") as HTMLLIElement,
+  });
 }

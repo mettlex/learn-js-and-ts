@@ -1,5 +1,5 @@
 import { createElement } from "../lib/tsx";
-import { iifeForEvent, useId } from "../lib/utils";
+import { useId } from "../lib/utils";
 
 // Model
 type CounterState = {
@@ -16,10 +16,6 @@ const containerId = useId("count");
 type CounterProps = {
   count?: number;
 };
-
-// We should do something better than this! See: Todo.tsx
-window.counterState = counterState;
-window.updateCountElement = updateCountElement;
 
 // View
 export function Counter({ count = 0 }: CounterProps) {
@@ -46,38 +42,40 @@ function getCounterContainer() {
   return counterContainer;
 }
 
+export const incrementButtonId = "inc-btn";
+
 function IncrementButton() {
   return (
-    <button
-      onclick={iifeForEvent(() => {
-        // Update State
-        window.counterState.count += 1;
-
-        // Update View
-        window.updateCountElement();
-      })}
-      style={{ margin: "5px" }}
-    >
+    <button id={incrementButtonId} style={{ margin: "5px" }}>
       ➕1️⃣
     </button>
   );
 }
 
+export function increment() {
+  // Update State
+  counterState.count += 1;
+
+  // Update View
+  updateCountElement();
+}
+
+export const decrementButtonId = "dec-btn";
+
 function DecrementButton() {
   return (
-    <button
-      onclick={iifeForEvent(() => {
-        // Update State
-        window.counterState.count -= 1;
-
-        // Update View
-        window.updateCountElement();
-      })}
-      style={{ margin: "5px" }}
-    >
+    <button id={decrementButtonId} style={{ margin: "5px" }}>
       ➖1️⃣
     </button>
   );
+}
+
+export function decrement() {
+  // Update State
+  counterState.count -= 1;
+
+  // Update View
+  updateCountElement();
 }
 
 // Update
@@ -91,12 +89,4 @@ function updateCountElement() {
   container.textContent = counterState.count.toString();
 
   container.style.color = counterState.count % 2 === 0 ? "purple" : "blue";
-}
-
-// Need to be in global scope
-declare global {
-  interface Window {
-    counterState: typeof counterState;
-    updateCountElement: typeof updateCountElement;
-  }
 }

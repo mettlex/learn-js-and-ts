@@ -1,37 +1,53 @@
 import { createElement } from "./lib/tsx";
-
-import { iifeForEvent } from "./lib/utils";
-import { Counter } from "./components/Counter";
-import { Todo } from "./components/Todo";
+import {
+  Counter,
+  decrement,
+  decrementButtonId,
+  increment,
+  incrementButtonId,
+} from "./components/Counter";
+import {
+  Todo,
+  handleTodoDeleteButtonClick,
+  handleTodoFormSubmit,
+  handleTodoToggleClick,
+  todoDeleteButtonIds,
+  todoFormId,
+  todoToggleContainerIds,
+} from "./components/Todo";
 
 const basic = document.createElement("div");
 
 // Do not use .innerHTML like this
 // This is just a demo for understanding
-basic.innerHTML = (
-  <button
-    onclick={iifeForEvent(() => {
-      alert("It works!");
-    })}
-  >
-    Basic Example. Click Me!
-  </button>
-);
+basic.innerHTML = <button>Basic Example. Click Me!</button>;
 
 // We don't want a div wrapping the button
 if (basic.firstChild) {
   // render firstChild which is the button
-  document.body.appendChild(basic.firstChild);
+  document.body.appendChild(basic.firstChild).addEventListener("click", () => {
+    alert("It works!");
+  });
 }
 
 //#region Counter Example
 
-const app = document.createElement("div");
+const container = document.createElement("div");
 
-app.innerHTML = <Counter />;
+container.innerHTML = <Counter />;
 
-if (app.firstChild) {
-  document.body.appendChild(app.firstChild);
+const counterElement = container.firstChild;
+
+if (counterElement) {
+  document.body.appendChild(counterElement);
+
+  document
+    .getElementById(incrementButtonId)
+    ?.addEventListener("click", increment);
+
+  document
+    .getElementById(decrementButtonId)
+    ?.addEventListener("click", decrement);
 }
 
 //#endregion Counter Example
@@ -49,8 +65,26 @@ todo.innerHTML = (
   />
 );
 
-if (todo.firstChild) {
-  document.body.appendChild(todo.firstChild);
+const todoElement = todo.firstChild;
+
+if (todoElement) {
+  document.body.appendChild(todoElement);
+
+  todoDeleteButtonIds.forEach((x) => {
+    document
+      .getElementById(x)
+      ?.addEventListener("click", handleTodoDeleteButtonClick);
+  });
+
+  todoToggleContainerIds.forEach((x) => {
+    document
+      .getElementById(x)
+      ?.addEventListener("click", handleTodoToggleClick);
+  });
+
+  document
+    .getElementById(todoFormId)
+    ?.addEventListener("submit", handleTodoFormSubmit);
 }
 
 //#endregion Todo Example

@@ -72,9 +72,3 @@ window.addEventListener("update", (event: UpdateEvent) => {
     }
   }
 });
-
-declare global {
-  interface Window {
-    sendUpdateEvent: typeof sendUpdateEvent;
-  }
-}

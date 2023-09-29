@@ -3,7 +3,7 @@
 const ESCAPED_REGEX = /[<"'&]/;
 const CAMEL_REGEX = /[a-z][A-Z]/;
 
-/** @type {import('.').escapeHtml} */
+/** @type {import('./tsx').escapeHtml} */
 let escapeHtml = function (value) {
   if (typeof value !== "string") {
     value = value.toString();
@@ -58,7 +58,7 @@ let escapeHtml = function (value) {
 // @ts-ignore - bun runtime have its own escapeHTML function.
 if (typeof Bun !== "undefined") escapeHtml = Bun.escapeHTML;
 
-/** @type {import('.').attributesToString} */
+/** @type {import('./tsx').attributesToString} */
 function attributesToString(attributes) {
   const keys = Object.keys(attributes);
   const length = keys.length;
@@ -72,6 +72,11 @@ function attributesToString(attributes) {
 
     // Skips all @kitajs/html specific attributes.
     if (key === "children" || key === "safe") {
+      continue;
+    }
+
+    // Event handlers are irrelevant
+    if (key.startsWith("on")) {
       continue;
     }
 
@@ -159,7 +164,7 @@ function attributesToString(attributes) {
 }
 
 /**
- * @type {import('.').contentsToString}
+ * @type {import('./tsx').contentsToString}
  * @returns {any}
  */
 function contentsToString(contents, escape) {
@@ -213,7 +218,7 @@ function contentsToString(contents, escape) {
 /**
  * Just to stop TS from complaining about the type.
  *
- * @type {import('.').createElement}
+ * @type {import('./tsx').createElement}
  * @param {any} name
  * @returns {any}
  */
@@ -272,7 +277,7 @@ export function createElement(name, attrs, ...children) {
   });
 }
 
-/** @type {import('.').styleToString} */
+/** @type {import('./tsx').styleToString} */
 function styleToString(style) {
   // Faster escaping process that only looks for the " character.
   // As we use the " character to wrap the style string, we need to escape it.
@@ -359,7 +364,7 @@ function styleToString(style) {
   return result;
 }
 
-/** @type {import('.').toKebabCase} */
+/** @type {import('./tsx').toKebabCase} */
 function toKebabCase(camel) {
   // This is a optimization to avoid the whole conversion process when the
   // string does not contain any uppercase characters.
@@ -395,7 +400,7 @@ function toKebabCase(camel) {
   return kebab;
 }
 
-/** @type {import('.').isUpper} */
+/** @type {import('./tsx').isUpper} */
 function isUpper(input, index) {
   const code = input.charCodeAt(index);
   return code >= 65 /* A */ && code <= 90; /* Z */
