@@ -4,14 +4,19 @@
 import { useState } from "react";
 
 // Model
-export type ItemProps = {
+export type ItemType = {
   label: string;
   selected: boolean;
 };
 
-export function Item({ label, selected }: ItemProps) {
+export type ItemProps = {
+  item: ItemType;
+  onSelectionChange: (item: ItemType) => void;
+};
+
+export function Item({ item, onSelectionChange }: ItemProps) {
   // State
-  const [isChecked, setIsChecked] = useState(selected);
+  const [isChecked, setIsChecked] = useState(item.selected);
 
   // State is for variables that change
   // Props is for variables that never change
@@ -23,11 +28,12 @@ export function Item({ label, selected }: ItemProps) {
         // Update
         onChange={() => {
           setIsChecked(!isChecked);
+          onSelectionChange(item);
         }}
         type="checkbox"
         checked={isChecked}
       />
-      <label>{label}</label>
+      <label>{item.label}</label>
     </section>
   );
 }
