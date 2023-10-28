@@ -5,11 +5,14 @@
   "dependencies": {
     "@hono/node-server": "^1.2.0",
     "better-sqlite3": "^9.0.0",
-    "hono": "^3.7.2"
+    "drizzle-orm": "^0.28.6",
+    "hono": "^3.7.2",
+    "mysql2": "^3.6.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.6",
     "@types/node": "^20.8.6",
+    "drizzle-kit": "^0.19.13",
     "nodemon": "^3.0.1",
     "tsx": "^3.12.2"
   }

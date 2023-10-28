@@ -1,12 +1,12 @@
-import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 
-const DATABASE_FILENAME = "database.db";
-export const TABLE_NAME = "notes";
-
-export const db = new Database(DATABASE_FILENAME, {
-  verbose: console.log,
+const connection = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.DB_USER,
+  database: process.env.MYSQL_DATABASE,
+  password: process.env.MYSQL_ROOT_PASSWORD,
+  port: +(process.env.MYSQL_PORT || ""),
 });
 
-db.pragma("journal_mode = WAL");
-
-console.log(db.prepare(`select * from ${TABLE_NAME};`).all());
+export const db = drizzle(connection);

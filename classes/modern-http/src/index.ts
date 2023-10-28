@@ -4,7 +4,6 @@ import { secureHeaders } from "hono/secure-headers";
 import { cors } from "hono/cors";
 import { compress } from "hono/compress";
 import {
-  notes,
   createNote,
   Note,
   deleteNote,
@@ -26,13 +25,13 @@ app.use(
   }),
 );
 
-app.get("/", (c) => c.json(getAll())); // LIST
+app.get("/", async (c) => c.json(await getAll())); // LIST
 
-app.get("/:id", (c) => {
+app.get("/:id", async (c) => {
   // READ
   const id = c.req.param("id");
 
-  const found = getNote(parseInt(id));
+  const found = await getNote(parseInt(id));
 
   if (!found) {
     c.status(404);
@@ -46,6 +45,8 @@ app.put("/:id", async (c) => {
   // UPDATE
   const id = c.req.param("id");
   const data = await c.req.json();
+
+  const notes = await getAll();
 
   const foundIndex = notes.findIndex((n) => n.id === parseInt(id));
 
@@ -65,9 +66,11 @@ app.put("/:id", async (c) => {
   return c.json({ message: "successfully updated" });
 });
 
-app.delete("/:id", (c) => {
+app.delete("/:id", async (c) => {
   // DELETE
   const id = c.req.param("id");
+
+  const notes = await getAll();
 
   const foundIndex = notes.findIndex((n) => n.id === parseInt(id));
 
@@ -89,16 +92,20 @@ app.post("/", async (c) => {
 
   // TODO: request data validation
 
+  const notes = await getAll();
+
   if (notes.find((x) => x.text === data.text)) {
     return c.json({ message: "already exists" });
   }
 
   const newNote: Partial<Note> = {
     text: data.text,
-    date: data.date,
+    date: new Date(data.date),
   };
 
-  const dbNote = createNote(newNote);
+  const dbNote = await createNote(newNote);
+
+  console.log({ dbNote });
 
   notes.push(dbNote);
 
