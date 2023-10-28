@@ -1,0 +1,5 @@
+node_modules
+notes.json
+*.db*
+.env*
+!.env.example
