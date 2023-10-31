@@ -63,8 +63,11 @@ export async function updateNote(id: number, note: Partial<Note>) {
     return;
   }
 
-  await db.update(notesSchema).set({
-    date: note.date,
-    text: note.text,
-  });
+  await db
+    .update(notesSchema)
+    .set({
+      date: note.date,
+      text: note.text,
+    })
+    .where(eq(notesSchema.id, id));
 }
