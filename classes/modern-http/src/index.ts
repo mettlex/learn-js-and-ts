@@ -81,7 +81,7 @@ app.put("/:id", async (c) => {
   notes[foundIndex] = {
     id: notes[foundIndex].id,
     text: validatedData.text || notes[foundIndex].text,
-    date: new Date(validatedData.date || notes[foundIndex].date),
+    date: new Date(validatedData.date || notes[foundIndex].date.getTime()),
   };
 
   await updateNote(notes[foundIndex].id, notes[foundIndex]);
