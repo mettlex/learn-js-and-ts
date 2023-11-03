@@ -11,6 +11,7 @@ import {
   getNote,
   updateNote,
 } from "./notes";
+import { getSingleNoteSchema, updateNoteRequestSchema } from "./schema";
 
 const app = new Hono();
 
@@ -25,13 +26,21 @@ app.use(
   }),
 );
 
+// TODO: Pagination
+
 app.get("/", async (c) => c.json(await getAll())); // LIST
 
 app.get("/:id", async (c) => {
   // READ
-  const id = c.req.param("id");
+  const id = parseInt(c.req.param("id"));
 
-  const found = await getNote(parseInt(id));
+  const result = getSingleNoteSchema.safeParse(id);
+
+  if (!result.success) {
+    return c.json({ message: JSON.parse(result.error.message)[0].message });
+  }
+
+  const found = await getNote(id);
 
   if (!found) {
     c.status(404);
@@ -43,12 +52,26 @@ app.get("/:id", async (c) => {
 
 app.put("/:id", async (c) => {
   // UPDATE
-  const id = c.req.param("id");
+  const id = parseInt(c.req.param("id"));
   const data = await c.req.json();
+
+  const result = getSingleNoteSchema.safeParse(id);
+
+  if (!result.success) {
+    return c.json({ message: JSON.parse(result.error.message)[0].message });
+  }
+
+  const validation = updateNoteRequestSchema.safeParse(data);
+
+  if (!validation.success) {
+    return c.json({ message: JSON.parse(validation.error.message)[0] });
+  }
+
+  const validatedData = validation.data;
 
   const notes = await getAll();
 
-  const foundIndex = notes.findIndex((n) => n.id === parseInt(id));
+  const foundIndex = notes.findIndex((n) => n.id === id);
 
   if (foundIndex === -1) {
     c.status(404);
@@ -57,11 +80,11 @@ app.put("/:id", async (c) => {
 
   notes[foundIndex] = {
     id: notes[foundIndex].id,
-    text: data.text || notes[foundIndex].text,
-    date: new Date(data.date) || notes[foundIndex].date,
+    text: validatedData.text || notes[foundIndex].text,
+    date: new Date(validatedData.date || notes[foundIndex].date),
   };
 
-  updateNote(notes[foundIndex].id, notes[foundIndex]);
+  await updateNote(notes[foundIndex].id, notes[foundIndex]);
 
   return c.json({ message: "successfully updated" });
 });
