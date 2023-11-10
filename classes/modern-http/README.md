@@ -7,6 +7,10 @@ Create a `.env` file and set the following values:
 ```
 MYSQL_ROOT_PASSWORD=
 PMA_PASSWORD=
+MYSQL_HOST=
+MYSQL_PORT=
+MYSQL_DATABASE=
+DB_USER=
 ```
 
 Modern HTTP API has these components:
@@ -21,15 +25,18 @@ Modern HTTP API has these components:
   - POST to create new resources
   - PUT/PATCH to update/edit existing resources
   - DELETE to delete existing resources
-4. Storage:
+4. Data Validation and Sanitization
+  - User input checks
+  - Schema validation (e.g. JSON schema)
+5. Storage:
   - In-memory storage (Volatile)
   - File based storage (Persistent)
-5. In-memory storage:
+6. In-memory storage:
   - simple variables
   - redis
   - memcached
   - Key-Value in-memory store
-6. File based storage:
+7. File based storage:
   - Static file (html, css, js etc.)
   - Complex database:
     - Relational Database: MySQL, PostgreSQL, SQLite etc.
@@ -37,3 +44,13 @@ Modern HTTP API has these components:
     - Graph: Neo4j etc.
     - Vector: Chroma etc.
     
+## Tools you should know
+
+- 2FA apps (Authy, Authenticator, etc.)
+- Git
+- IDE
+- Bash, Zsh, etc.
+- SSH
+- Search engine
+- AI
+- Docker
