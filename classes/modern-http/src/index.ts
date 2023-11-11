@@ -7,11 +7,17 @@ import {
   createNote,
   Note,
   deleteNote,
-  getAll,
   getNote,
   updateNote,
+  getPaginated,
+  getNoteByText,
 } from "./notes";
-import { getSingleNoteSchema, updateNoteRequestSchema } from "./schema";
+import {
+  createNoteRequestSchema,
+  getPaginatedNotesSchema,
+  getSingleNoteSchema,
+  updateNoteRequestSchema,
+} from "./schema";
 
 const app = new Hono();
 
@@ -26,17 +32,24 @@ app.use(
   }),
 );
 
-// TODO: Pagination
-
 app.post("/", async (c) => {
   // CREATE
   const data = await c.req.json();
 
-  // TODO: request data validation
+  const validation = createNoteRequestSchema.safeParse(data);
 
-  const notes = await getAll();
+  if (!validation.success) {
+    c.status(400);
+    return c.json({
+      success: false,
+      message: JSON.parse(validation.error.message)[0],
+    });
+  }
 
-  if (notes.find((x) => x.text === data.text)) {
+  const note = await getNoteByText(validation.data.text);
+
+  if (note) {
+    c.status(400);
     return c.json({ message: "already exists" });
   }
 
@@ -48,8 +61,6 @@ app.post("/", async (c) => {
   const dbNote = await createNote(newNote);
 
   console.log({ dbNote });
-
-  notes.push(dbNote);
 
   return c.json({ message: "successfully added the note", note: dbNote });
 });
@@ -116,8 +127,6 @@ app.put("/:id", async (c) => {
     });
   }
 
-  const id = result.data;
-
   const validation = updateNoteRequestSchema.safeParse(data);
 
   if (!validation.success) {
@@ -132,10 +141,17 @@ app.put("/:id", async (c) => {
 
   let success = true;
   let message = "Successfully retrieved";
-  let notes: Note[];
+  let note: Note | undefined;
 
   try {
-    notes = await getAll();
+    const found = await getNote(result.data);
+
+    if (!found) {
+      c.status(404);
+      return c.json({ message: "note not found" });
+    }
+
+    note = found;
   } catch (error) {
     c.status(500);
     success = false;
@@ -144,21 +160,14 @@ app.put("/:id", async (c) => {
     return c.json({ success, message });
   }
 
-  const foundIndex = notes.findIndex((n) => n.id === id);
-
-  if (foundIndex === -1) {
-    c.status(404);
-    return c.json({ success: false, message: "note not found" });
-  }
-
-  notes[foundIndex] = {
-    id: notes[foundIndex].id,
-    text: validatedData.text || notes[foundIndex].text,
-    date: new Date(validatedData.date || notes[foundIndex].date.getTime()),
+  note = {
+    id: note.id,
+    text: validatedData.text || note.text,
+    date: new Date(validatedData.date || note.date.getTime()),
   };
 
   try {
-    await updateNote(notes[foundIndex].id, notes[foundIndex]);
+    await updateNote(note.id, note);
   } catch (error) {
     console.error(error);
     c.status(500);
@@ -172,16 +181,22 @@ app.delete("/:id", async (c) => {
   // DELETE
   const id = c.req.param("id");
 
-  const notes = await getAll();
+  const result = getSingleNoteSchema.safeParse(id);
 
-  const foundIndex = notes.findIndex((n) => n.id === parseInt(id));
+  if (!result.success) {
+    c.status(400);
+    return c.json({
+      success: false,
+      message: JSON.parse(result.error.message)[0].message,
+    });
+  }
 
-  if (foundIndex === -1) {
+  const found = await getNote(result.data);
+
+  if (!found) {
     c.status(404);
     return c.json({ message: "note not found" });
   }
-
-  notes.splice(foundIndex, 1);
 
   deleteNote(parseInt(id));
 
@@ -193,8 +208,24 @@ app.get("/", async (c) => {
   let message = "Successfully retrieved";
   let notes: Note[];
 
+  const limit = parseInt(c.req.query("limit") || "10");
+  const page = parseInt(c.req.query("page") || "0");
+  const id = parseInt(c.req.query("id") || "0");
+
+  const result = getPaginatedNotesSchema.safeParse({ limit, page, id });
+
+  if (!result.success) {
+    c.status(400);
+    return c.json({
+      success: false,
+      message: JSON.parse(result.error.message)[0].message,
+    });
+  }
+
   try {
-    notes = await getAll();
+    notes = await getPaginated(
+      result.data as Parameters<typeof getPaginated>[0],
+    );
   } catch (error) {
     c.status(500);
     success = false;
