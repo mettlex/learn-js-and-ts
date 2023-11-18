@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "./input";
 
 const minLength = 2;
 const maxLength = 50;
@@ -26,6 +26,15 @@ const formSchema = z.object({
       message: `Username must be at least ${minLength} characters.`,
     })
     .max(maxLength, {
+      message: `Username can't be more than ${maxLength} characters`,
+    }),
+
+  password: z
+    .string()
+    .min(8, {
+      message: `Username must be at least ${minLength} characters.`,
+    })
+    .max(100, {
       message: `Username can't be more than ${maxLength} characters`,
     }),
 });
@@ -55,16 +64,36 @@ export function ProfileForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
+
               <FormControl>
                 <Input placeholder="Your username" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+
               <FormMessage />
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+
+              <FormControl>
+                <PasswordInput
+                  type="password"
+                  placeholder="Your password"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit">Submit</Button>
       </form>
     </Form>
