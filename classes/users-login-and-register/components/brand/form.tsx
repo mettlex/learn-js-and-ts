@@ -14,59 +14,83 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { PasswordInput } from "./input";
 
 const minLength = 2;
 const maxLength = 50;
+const passwordMinLength = 6;
+const passwordMaxLength = 100;
 
 const formSchema = z.object({
-  username: z
+  email: z
     .string()
     .min(minLength, {
-      message: `Username must be at least ${minLength} characters.`,
+      message: `Email must be at least ${minLength} characters.`,
     })
     .max(maxLength, {
-      message: `Username can't be more than ${maxLength} characters`,
+      message: `Email can't be more than ${maxLength} characters`,
     }),
 
   password: z
     .string()
-    .min(8, {
-      message: `Username must be at least ${minLength} characters.`,
+    .min(passwordMinLength, {
+      message: `Password must be at least ${passwordMinLength} characters.`,
     })
-    .max(100, {
-      message: `Username can't be more than ${maxLength} characters`,
+    .max(passwordMaxLength, {
+      message: `Password can't be more than ${passwordMaxLength} characters`,
     }),
 });
 
 export function ProfileForm() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [message, setMessage] = useState("");
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+
+      const result = await response.json();
+
+      if (result.message.includes("successful")) {
+        setLoggedIn(true);
+        setMessage(result.message);
+      }
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={`space-y-8 ${loggedIn ? "hidden" : ""}`}
+      >
         <FormField
           control={form.control}
-          name="username"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
 
               <FormControl>
-                <Input placeholder="Your username" {...field} />
+                <Input placeholder="Your email" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -96,6 +120,8 @@ export function ProfileForm() {
 
         <Button type="submit">Submit</Button>
       </form>
+
+      {loggedIn && <p>{message}</p>}
     </Form>
   );
 }

@@ -1,9 +1,17 @@
-import { ProfileForm } from "@/components/brand/form";
+import { UserButton, currentUser } from "@clerk/nextjs";
 
-export default function Home() {
+export default async function HomePage() {
+  const user = await currentUser();
+
+  const fullName = `${user?.firstName} ${
+    (user?.lastName && user?.lastName) || ""
+  }`;
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <ProfileForm />
+      <UserButton afterSignOutUrl="/" />
+
+      {(user?.firstName && fullName) || user?.username}
     </main>
   );
 }

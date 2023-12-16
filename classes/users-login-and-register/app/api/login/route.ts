@@ -8,16 +8,18 @@ const registerRequestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body;
+
+  try {
+    body = await request.json();
+  } catch (error) {
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
   const result = registerRequestSchema.safeParse(body);
 
-  const headers = new Headers();
-  headers.set("content-type", "application/json");
-
   if (!result.success) {
-    return new Response(JSON.stringify(result.error.errors[0]), {
-      headers,
+    return Response.json(result.error.errors[0], {
       status: 400,
     });
   }
@@ -30,19 +32,25 @@ export async function POST(request: Request) {
   console.log({ userInDatabase });
 
   if (!userInDatabase) {
-    return new Response(JSON.stringify({ error: "User not found" }), {
-      status: 404,
-    });
+    return Response.json(
+      { error: "User not found" },
+      {
+        status: 404,
+      },
+    );
   }
 
   // TODO: hash password using argon2 or bcrypt
   result.data.password = await hash(result.data.password);
 
   if (result.data.password !== userInDatabase.password) {
-    return new Response(JSON.stringify({ error: "password did not match" }), {
-      status: 401,
-    });
+    return Response.json(
+      { error: "password did not match" },
+      {
+        status: 401,
+      },
+    );
   }
 
-  return new Response(JSON.stringify({ message: "Login successful" }));
+  return Response.json({ message: "Login successful" });
 }
