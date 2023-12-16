@@ -1,7 +1,13 @@
+import { db } from "@/db";
+import { Role } from "@/db/schemas";
 import { UserButton, currentUser } from "@clerk/nextjs";
 
 export default async function HomePage() {
   const user = await currentUser();
+
+  const roles = await db.select().from(Role);
+
+  console.log(roles);
 
   const fullName = `${user?.firstName} ${
     (user?.lastName && user?.lastName) || ""
