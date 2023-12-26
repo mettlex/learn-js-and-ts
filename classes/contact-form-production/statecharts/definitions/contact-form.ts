@@ -28,6 +28,11 @@ export const machine = createMachine(
         },
       },
       FormSuccess: {
+        entry: assign({
+          email: ({ event }) => event.data.email,
+          message: ({ event }) => event.data.message,
+          error: "",
+        }),
         invoke: {
           src: "requestApiWithFormData",
           onDone: {
@@ -42,10 +47,10 @@ export const machine = createMachine(
       FormSubmitted: {},
       FormError: {
         on: {
-          "form.submit_again": [
+          "form.submit": [
             {
               target: "FormSuccess",
-              guard: "validated2",
+              guard: "validated",
             },
             {
               target: "FormError",
@@ -72,23 +77,6 @@ export const machine = createMachine(
 
           return false;
         }
-
-        console.log(context);
-
-        return true;
-      },
-      validated2: ({ context, event }, params) => {
-        console.log(event);
-        const result = contactFormSchema.safeParse(event.data);
-
-        if (!result.success) {
-          console.log(result.error.errors);
-          context.error = result.error.errors[0].message;
-
-          return false;
-        }
-
-        console.log(context);
 
         return true;
       },

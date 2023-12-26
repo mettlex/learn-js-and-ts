@@ -20,31 +20,20 @@ export default function ContactForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  console.log({
-    current: state.value,
-    context: state.context,
-  });
+  if (state.matches("FormSuccess")) {
+    console.log(state.context);
+  }
 
   const handleSubmit: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
 
-    if (state.matches("FormShown")) {
-      send({
-        type: "form.submit",
-        data: {
-          email,
-          message,
-        },
-      });
-    } else if (state.matches("FormError")) {
-      send({
-        type: "form.submit_again",
-        data: {
-          email,
-          message,
-        },
-      });
-    }
+    send({
+      type: "form.submit",
+      data: {
+        email,
+        message,
+      },
+    });
   };
 
   return (
