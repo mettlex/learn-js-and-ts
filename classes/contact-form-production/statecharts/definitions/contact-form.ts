@@ -1,4 +1,4 @@
-import { assign, createMachine } from "xstate";
+import { assign, createMachine, fromPromise } from "xstate";
 
 import { GlobalContext, GlobalEvent } from "@/statecharts/types";
 import { contactFormSchema } from "@/schema";
@@ -34,7 +34,9 @@ export const machine = createMachine(
           error: "",
         }),
         invoke: {
+          id: "requestApiWithFormData",
           src: "requestApiWithFormData",
+          input: ({ context: { email, message } }) => ({ email, message }),
           onDone: {
             target: "FormSubmitted",
           },
@@ -66,14 +68,30 @@ export const machine = createMachine(
   },
   {
     actions: {},
-    actors: {},
+    actors: {
+      requestApiWithFormData: fromPromise(async ({ input }) => {
+        const { email, message } = input as GlobalContext;
+
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ email, message }),
+        });
+
+        console.log(await response.json());
+      }),
+    },
     guards: {
       validated: ({ context, event }, params) => {
         console.log(event);
         const result = contactFormSchema.safeParse(event.data);
 
         if (!result.success) {
-          context.error = result.error.errors[0].message;
+          const err = result.error.errors[0].message;
+
+          context.error = err.replace("String", "Message");
 
           return false;
         }

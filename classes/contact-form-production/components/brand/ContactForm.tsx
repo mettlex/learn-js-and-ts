@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { useActor } from "@xstate/react";
 
 import {
@@ -19,6 +19,7 @@ export default function ContactForm() {
   const [state, send] = useActor(machine);
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [flag, setFlag] = useState(true);
 
   if (state.matches("FormSuccess")) {
     console.log(state.context);
@@ -34,6 +35,8 @@ export default function ContactForm() {
         message,
       },
     });
+
+    setFlag(!flag);
   };
 
   return (
@@ -45,9 +48,7 @@ export default function ContactForm() {
         </p>
       </CardHeader>
 
-      {state.context.error}
-
-      {!state.matches("FormSuccess") && (
+      {!state.matches("FormSubmitted") && (
         <>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -76,9 +77,12 @@ export default function ContactForm() {
               />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col">
+            <div className="text-red-500 m-4">{state.context.error}</div>
+
             <Button
               onClick={handleSubmit}
+              disabled={state.matches("FormSuccess")}
               className="w-full md:w-auto bg-blue-600 text-white hover:bg-blue-500"
             >
               Send Message
