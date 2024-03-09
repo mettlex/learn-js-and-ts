@@ -37,7 +37,7 @@
 
 (e) Recreate your previous Todo app in **React** with **TypeScript**.
 
-### Step 4. Learn back-end stuff with Node.js & Deno.
+### Step 4. Learn back-end stuff with Bun, Deno & Node.js
 
 `[todo]`
 
